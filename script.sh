@@ -35,3 +35,8 @@ chmod -R go= /home/$username/.ssh/
 chown -R $username:$username /home/$username/.ssh/
 echo -e "Access rights changed \n"
 
+
+mv /etc/ssh/sshd_config /etc/ssh/sshd_config.old
+cp $(pwd)/sshd_config /etc/ssh/sshd_config
+echo "" >> /etc/ssh/sshd_config
+echo "Port 22" >> /etc/ssh/sshd_config
