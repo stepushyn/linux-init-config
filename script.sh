@@ -55,3 +55,9 @@ systemctl restart sshd
 # ufw config & enable
 # ban ipv6
 # apt update & upgrade
+# apt-get install -y mc htop tree net-tools
+# запит дозволів (перезагрузити ssh?)
+# http://wiki.metawerx.net/wiki/LBSA
+# https://www.digitalocean.com/community/tutorials/automating-initial-server-setup-with-ubuntu-18-04
+
+# https://ostechnix.com/ubuntu-server-secure-script-secure-harden-ubuntu/
