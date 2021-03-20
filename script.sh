@@ -36,11 +36,22 @@ chown -R $username:$username /home/$username/.ssh/
 echo -e "Access rights changed \n"
 
 
+
+# Copy SSH config
 mv /etc/ssh/sshd_config /etc/ssh/sshd_config.old
 cp $(pwd)/sshd_config /etc/ssh/sshd_config
 echo "" >> /etc/ssh/sshd_config
 
 
+
+# Change SSH port
 read -p "Enter SSH port: " port
 echo "Port $port" >> /etc/ssh/sshd_config
 systemctl restart sshd
+
+
+# to do:
+#
+# ufw config & enable
+# ban ipv6
+# apt update & upgrade
