@@ -26,7 +26,6 @@ echo "User creted and added to sudo group"
 ###################################
 # SSH config
 ###################################
-
 # Create a .ssh folder
 if [ ! -d "/home/$username/.ssh" ]
 then
@@ -98,19 +97,16 @@ fi
 
 
 
-read -p "Restart SSH daemon? (y/n) " restartssh
-if [[ $restartssh = "y" || $restartssh = "Y" ]]
-then
-	systemctl restart sshd
-	echo "SSH restarted"
-fi
-
-
-
 ####################################
 # UFW configuration
 ####################################
-ufw allow $port
+if [ port -eq 22 ]
+then
+	ufw allow OpenSSH
+else
+	sudo ufw deny OpenSSH
+	ufw allow "$port/tcp"
+fi
 
 
 
@@ -120,6 +116,17 @@ then
 	sed -i -e 's/IPV6=yes/IPV6=no/g' /etc/default/ufw
 fi
 
+
+
+####################################
+# Restart
+####################################
+read -p "Restart SSH daemon? (y/n) " restartssh
+if [[ $restartssh = "y" || $restartssh = "Y" ]]
+then
+	systemctl restart sshd
+	echo "SSH restarted"
+fi
 
 
 read -p "Enable UFW? (y/n) " enableufw
@@ -132,4 +139,3 @@ fi
 
 
 # https://www.digitalocean.com/community/tutorials/automating-initial-server-setup-with-ubuntu-18-04
-
