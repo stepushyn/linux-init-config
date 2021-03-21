@@ -68,7 +68,7 @@ fi
 
 
 read -p "Enter SSH port (default 22): " port
-if [ port -ne 22 ]
+if [ $port -ne 22 ]
 then
 	echo "Port $port" >> /etc/ssh/sshd_config.d/my-config.conf
 	echo "SSH port changed to $port"
