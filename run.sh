@@ -6,7 +6,7 @@
 ###################################
 read -p "Enter username: " username
 
-read -p "Copy password from root? " copypassword
+read -p "Copy password from root? (y/n) " copypassword
 if [[ $copypassword = "y" || $copypassword = "Y" ]]
 then
 	password="$(grep root /etc/shadow | cut --delimiter=: --fields=2)"
