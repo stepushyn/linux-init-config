@@ -4,13 +4,13 @@
 echo ""
 read -p "Enter username: " username
 sudo adduser "$username" -q --gecos ""
-echo -e "\nNew user created \n"
+echo "\nNew user created"
 
 
 
 # Add a new user to the sudo group
 usermod -aG sudo $username
-echo -e "User added to sudo group \n"
+echo "User added to sudo group"
 
 
 
@@ -18,7 +18,7 @@ echo -e "User added to sudo group \n"
 if [ ! -d "/home/$username/.ssh" ]
 then
 	mkdir /home/$username/.ssh
-	echo -e ".ssh folder created \n"
+	echo ".ssh folder created"
 fi
 
 
@@ -27,9 +27,9 @@ fi
 read -p "Add a public key? (y/n) " pubkey
 if [[ $pubkey = "y" || $pubkey = "Y" ]]
 then
-	read -p "\nEnter pub key: " pubkey
+	read -p "Enter pub key: " pubkey
 	echo "$pubkey" > /home/$username/.ssh/authorized_keys
-	echo -e "\nPub key saved to authorized_keys \n"
+	echo "Pub key saved to authorized_keys"
 fi
 
 
@@ -37,34 +37,39 @@ fi
 # Change access rights
 chmod -R go= /home/$username/.ssh/
 chown -R $username:$username /home/$username/.ssh/
-echo -e "Access rights changed \n"
+echo "Access rights changed"
 
 
 ###################################
 # SSH config
 ###################################
-read -p "\nBan root login (y/n) " rootlogin
+if [ ! -d "/etc/ssh/sshd_config.d" ]
+then
+	mkdir /etc/ssh/sshd_config.d
+fi
+
+read -p "Ban root login (y/n) " rootlogin
 if [[ $rootlogin = "y" || $rootnogin = "Y" ]]
 then
 	echo -e "PermitRootLogin no\n" > /etc/ssh/sshd_config.d/my-config.conf
-	echo -e "\nRoot login banned"
+	echo "Root login banned"
 fi
 
 
-read -p "\nBan password Authentication (y/n)" passwordauth
+read -p "Ban password Authentication (y/n)" passwordauth
 if [[ $passwordauth = "y" || $passwordauth = "Y" ]]
 then
 	echo -e "PasswordAuthentication no\n" >> /etc/ssh/sshd_config.d/my-config.conf
-	echo -e "Password Authentication banned"
+	echo "Password Authentication banned"
 fi
 
 
-read -p "\nChange SSH port? (y/n) " port
+read -p "Change SSH port? (y/n) " port
 if [[ $port = "y" || $port = "Y" ]]
 then
 	read -p "Enter SSH port (default 22): " port
-	echo "Port $port" >> /etc/ssh/sshd_config.d/my-config.conf
-	echo -e "SSH port changed to $port"
+	echo -e "Port $port\n" >> /etc/ssh/sshd_config.d/my-config.conf
+	echo "SSH port changed to $port"
 fi
 
 
@@ -72,7 +77,7 @@ read -p "Restart SSH daemon? (y/n) " restart
 if [[ $restart = "y" || $restart = "Y" ]]
 then
 	systemctl restart sshd
-	echo -e "\nSSH restarted \n"
+	echo "SSH restarted"
 fi
 
 
@@ -80,14 +85,14 @@ fi
 # UFW configuration
 ####################################
 ufw allow $port
-read -p "\nBan IPv6? (y/n) " banipv6
+read -p "Ban IPv6? (y/n) " banipv6
 if [[ $banipv6 = "y" || $banipv6 = "Y" ]]
 then
 	cp /etc/default/ufw /etc/default/ufw.old
 	cp ufw_ipv6_no /etc/default/ufw
 fi
 
-read -p "\nEnable UFW? (y/n) " enableufw
+read -p "Enable UFW? (y/n) " enableufw
 if [[ $enableufw = "y" || $enableufw = "Y" ]]
 then
 	ufw enable
