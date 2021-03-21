@@ -45,7 +45,7 @@ echo "" >> /etc/ssh/sshd_config
 
 
 # Change SSH port
-read -p "Enter SSH port: " port
+read -p "Enter SSH port (default 22): " port
 echo "Port $port" >> /etc/ssh/sshd_config
 echo ""
 
@@ -60,7 +60,7 @@ fi
 
 # UFW configuration
 ufw allow $port
-read -p "Enable UFW? (y/n)" enableufw
+read -p "Enable UFW? (y/n) " enableufw
 if [[ $enableufw = "y" || $enableufw = "Y" ]]
 then
 	ufw enable
