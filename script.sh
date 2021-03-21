@@ -47,7 +47,24 @@ echo "" >> /etc/ssh/sshd_config
 # Change SSH port
 read -p "Enter SSH port: " port
 echo "Port $port" >> /etc/ssh/sshd_config
-systemctl restart sshd
+echo ""
+
+read -p "Restart sshd? (y/n) " restart
+if [[ $restart = "y" || $restart = "Y" ]]
+then
+	systemctl restart sshd
+	echo -e "\nsshd restarted \n"
+fi
+
+
+
+# UFW configuration
+ufw allow $port
+read -p "Enable UFW? (y/n)" enableufw
+if [[ $enableufw = "y" || $enableufw = "Y" ]]
+then
+	ufw enable
+fi
 
 
 # to do:
