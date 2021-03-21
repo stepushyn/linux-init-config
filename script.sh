@@ -24,9 +24,13 @@ fi
 
 
 # Writing the public key to authorized_keys
-read -p "Enter pub key: " pubkey
-echo "$pubkey" > /home/$username/.ssh/authorized_keys
-echo -e "\nPub key saved to authorized_keys \n"
+read -p "Add a public key? (y/n) " pubkey
+if [[ $pubkey = "y" || $pubkey = "Y" ]]
+then
+	read -p "\nEnter pub key: " pubkey
+	echo "$pubkey" > /home/$username/.ssh/authorized_keys
+	echo -e "\nPub key saved to authorized_keys \n"
+fi
 
 
 
@@ -36,31 +40,54 @@ chown -R $username:$username /home/$username/.ssh/
 echo -e "Access rights changed \n"
 
 
-
-# Copy SSH config
-mv /etc/ssh/sshd_config /etc/ssh/sshd_config.old
-cp $(pwd)/sshd_config /etc/ssh/sshd_config
-echo "" >> /etc/ssh/sshd_config
-
-
-
-# Change SSH port
-read -p "Enter SSH port (default 22): " port
-echo "Port $port" >> /etc/ssh/sshd_config
-echo ""
-
-read -p "Restart sshd? (y/n) " restart
-if [[ $restart = "y" || $restart = "Y" ]]
+###################################
+# SSH config
+###################################
+read -p "\nBan root login (y/n) " rootlogin
+if [[ $rootlogin = "y" || $rootnogin = "Y" ]]
 then
-	systemctl restart sshd
-	echo -e "\nsshd restarted \n"
+	echo -e "PermitRootLogin no\n" > /etc/ssh/sshd_config.d/my-config.conf
+	echo -e "\nRoot login banned"
 fi
 
 
+read -p "\nBan password Authentication (y/n)" passwordauth
+if [[ $passwordauth = "y" || $passwordauth = "Y" ]]
+then
+	echo -e "PasswordAuthentication no\n" >> /etc/ssh/sshd_config.d/my-config.conf
+	echo -e "Password Authentication banned"
+fi
 
+
+read -p "\nChange SSH port? (y/n) " port
+if [[ $port = "y" || $port = "Y" ]]
+then
+	read -p "Enter SSH port (default 22): " port
+	echo "Port $port" >> /etc/ssh/sshd_config.d/my-config.conf
+	echo -e "SSH port changed to $port"
+fi
+
+
+read -p "Restart SSH daemon? (y/n) " restart
+if [[ $restart = "y" || $restart = "Y" ]]
+then
+	systemctl restart sshd
+	echo -e "\nSSH restarted \n"
+fi
+
+
+####################################
 # UFW configuration
+####################################
 ufw allow $port
-read -p "Enable UFW? (y/n) " enableufw
+read -p "\nBan IPv6? (y/n) " banipv6
+if [[ $banipv6 = "y" || $banipv6 = "Y" ]]
+then
+	cp /etc/default/ufw /etc/default/ufw.old
+	cp ufw_ipv6_no /etc/default/ufw
+fi
+
+read -p "\nEnable UFW? (y/n) " enableufw
 if [[ $enableufw = "y" || $enableufw = "Y" ]]
 then
 	ufw enable
