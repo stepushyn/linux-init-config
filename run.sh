@@ -100,7 +100,7 @@ fi
 ####################################
 # UFW configuration
 ####################################
-if [ port -eq 22 ]
+if [ $port -eq 22 ]
 then
 	ufw allow OpenSSH
 else
