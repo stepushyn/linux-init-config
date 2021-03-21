@@ -1,15 +1,25 @@
 #! /bin/bash
 
+
+###################################
 # Create a new user
+###################################
 read -p "Enter username: " username
-sudo adduser "$username" -q --gecos ""
-echo "New user created"
 
+read -p "Copy password from root? " copypassword
+if [[ $copypassword = "y" || $copypassword = "Y" ]]
+then
+	password="$(grep root /etc/shadow | cut --delimiter=: --fields=2)"
+	adduser $username --quiet --disabled-password --gecos ""
+	usermod -aG sudo $username
+	echo "$username:$password" | chpasswd --encrypted 
 
+else
+	adduser $username --quiet --gecos ""
+	usermod -aG sudo $username
+fi
 
-# Add a new user to the sudo group
-usermod -aG sudo $username
-echo "User added to sudo group"
+echo "User creted and added to sudo group"
 
 
 
