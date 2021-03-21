@@ -13,6 +13,10 @@ echo "User added to sudo group"
 
 
 
+###################################
+# SSH config
+###################################
+
 # Create a .ssh folder
 if [ ! -d "/home/$username/.ssh" ]
 then
@@ -22,26 +26,33 @@ fi
 
 
 
-# Writing the public key to authorized_keys
-read -p "Add a public key? (y/n) " pubkey
+read -p "Copy root pub key to user authorized_keys (y/n) " rootkey
+if [[ $rootkey = "y" || $rootkey = "Y" ]]
+then
+	cp /root/.ssh/authorized_keys /home/$username/.ssh/authorized_keys
+	echo "Root pub key copied"
+fi
+
+
+
+read -p "Add a new pub key? (y/n) " pubkey
 if [[ $pubkey = "y" || $pubkey = "Y" ]]
 then
 	read -p "Enter pub key: " pubkey
-	echo "$pubkey" > /home/$username/.ssh/authorized_keys
+	echo "$pubkey" >> /home/$username/.ssh/authorized_keys
 	echo "Pub key saved to authorized_keys"
 fi
 
 
 
-# Change access rights
+# Change access rights to .ssh
 chmod -R go= /home/$username/.ssh/
 chown -R $username:$username /home/$username/.ssh/
 echo "Access rights changed"
 
 
-###################################
-# SSH config
-###################################
+
+# Create a dir for SSH config
 if [ ! -d "/etc/ssh/sshd_config.d" ]
 then
 	mkdir /etc/ssh/sshd_config.d
@@ -53,6 +64,7 @@ read -p "Ban root login (y/n) " rootlogin
 if [[ $rootlogin = "y" || $rootnogin = "Y" ]]
 then
 	echo "PermitRootLogin no" > /etc/ssh/sshd_config.d/my-config.conf
+	passwd --lock root
 	echo "Root login banned"
 fi
 
@@ -84,6 +96,7 @@ then
 fi
 
 
+
 ####################################
 # UFW configuration
 ####################################
@@ -108,14 +121,5 @@ fi
 
 
 
-# to do:
-#
-# ufw config & enable
-# ban ipv6
-# apt update & upgrade
-# apt-get install -y mc htop tree net-tools
-# запит дозволів (перезагрузити ssh?)
-# http://wiki.metawerx.net/wiki/LBSA
 # https://www.digitalocean.com/community/tutorials/automating-initial-server-setup-with-ubuntu-18-04
 
-# https://ostechnix.com/ubuntu-server-secure-script-secure-harden-ubuntu/
